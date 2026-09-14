@@ -3,18 +3,16 @@
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-export default function RefreshControls({
-  renderedAt,
-  intervalMs = 5000,
-}: {
+type Props = {
   renderedAt: string;
   intervalMs?: number;
-}) {
+};
+
+export default function RefreshControls({ renderedAt, intervalMs = 5000 }: Props) {
   const router = useRouter();
   const [auto, setAuto] = useState(true);
   const [isPending, startTransition] = useTransition();
 
-  // ponytail: polling, porque a API não expõe stream. Trocar por SSE/WebSocket se push for necessário.
   useEffect(() => {
     if (!auto) return;
     const timer = setInterval(() => router.refresh(), intervalMs);

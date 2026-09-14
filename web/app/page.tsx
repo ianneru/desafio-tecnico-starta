@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import RefreshControls from "./refresh-controls";
-import { fetchPayments, type PaymentEvent, type PaymentsPage } from "../lib/api";
+import { fetchPayments, type PaymentsPage } from "../lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +65,7 @@ function PaymentsTable({ data }: { data: PaymentsPage }) {
             </tr>
           </thead>
           <tbody>
-            {data.items.map((item: PaymentEvent) => {
+            {data.items.map((item) => {
               const failed = item.processingStatus === "Erro";
               return (
                 <Fragment key={item.id}>
@@ -160,9 +160,9 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
           <strong>Não foi possível consultar a API.</strong>
           <span>{result.error}</span>
         </div>
-      ) : (
-        <PaymentsTable data={result.data!} />
-      )}
+      ) : result.data ? (
+        <PaymentsTable data={result.data} />
+      ) : null}
 
       {pages > 1 && (
         <nav className="pager">
