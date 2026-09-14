@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: sabemi
+      POSTGRES_USER: sabemi
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sabemi -d sabemi"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:5070:8080"
+    environment:
+      ConnectionStrings__Payments: Host=postgres;Database=sabemi;Username=sabemi;Password=${POSTGRES_PASSWORD}
+      Security__ApiKey: ${SABEMI_API_KEY}
+      Database__ApplyMigrations: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  web:
+    build: ./web
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      SABEMI_API_URL: http://api:8080
+      SABEMI_API_KEY: ${SABEMI_API_KEY}
+    depends_on:
+      - api
+volumes:
+  postgres-data:
