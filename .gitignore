@@ -4,3 +4,4 @@
 .env
 *.user
 artifacts/
+.clinerules
