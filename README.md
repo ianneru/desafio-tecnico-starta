@@ -25,23 +25,16 @@ POSTGRES_PASSWORD=defina-uma-senha
 SABEMI_API_KEY=defina-uma-chave-com-no-minimo-32-bytes
 ```
 
-| Variável | Descrição |
-| --- | --- |
-| `POSTGRES_PASSWORD` | senha do PostgreSQL local |
-| `SABEMI_API_KEY` | chave das chamadas à API, **mínimo 32 bytes** |
+| Variável            | Descrição                                     |
+| ------------------- | --------------------------------------------- |
+| `POSTGRES_PASSWORD` | senha do PostgreSQL local                     |
+| `SABEMI_API_KEY`    | chave das chamadas à API, **mínimo 32 bytes** |
 
 Todos os endpoints, exceto `/health`, exigem o header `X-Api-Key`:
 
 ```powershell
 $headers = @{ 'X-Api-Key' = '<SABEMI_API_KEY>' }
 Invoke-RestMethod 'http://localhost:5070/pagamentos' -Headers $headers
-```
-
-Para clonar ou empurrar, lembre que o GitHub **não aceita senha** em HTTPS — use `gh auth login`, um Personal Access Token ou chave SSH:
-
-```powershell
-gh auth login
-# SSH: git remote set-url origin git@github.com:ianneru/desafio-tecnico-starta.git
 ```
 
 ## Painel web
@@ -59,14 +52,14 @@ npm install; npm run dev
 
 ## Endpoints
 
-| Método | Rota | Descrição |
-| --- | --- | --- |
-| POST | `/webhooks/pagamento` | Persiste a notificação antes de confirmar |
-| GET | `/pagamentos?status=&id_contrato=&pagina=&tamanho=` | Lista paginada, sem o corpo bruto |
-| GET | `/pagamentos/{id}` | Detalhes, corpo bruto e erro |
-| GET | `/contratos/{idContrato}` | Último estado do contrato |
-| GET | `/health` | 200 se o banco responder |
-| GET | `/openapi/v1.json` | Documento OpenAPI |
+| Método | Rota                                                | Descrição                                 |
+| ------ | --------------------------------------------------- | ----------------------------------------- |
+| POST   | `/webhooks/pagamento`                               | Persiste a notificação antes de confirmar |
+| GET    | `/pagamentos?status=&id_contrato=&pagina=&tamanho=` | Lista paginada, sem o corpo bruto         |
+| GET    | `/pagamentos/{id}`                                  | Detalhes, corpo bruto e erro              |
+| GET    | `/contratos/{idContrato}`                           | Último estado do contrato                 |
+| GET    | `/health`                                           | 200 se o banco responder                  |
+| GET    | `/openapi/v1.json`                                  | Documento OpenAPI                         |
 
 POST: `202` novo · `200` reenvio equivalente · `400` inválido · `401` key inválida · `409` transação com conteúdo divergente · `413` corpo > 64 KiB · `415` Content-Type errado · `503` banco fora. Um `202` não significa processado — acompanhe o `eventId`.
 
@@ -84,13 +77,9 @@ POST: `202` novo · `200` reenvio equivalente · `400` inválido · `401` key in
 
 ```powershell
 dotnet build .\Sabemi.sln
-dotnet run --project .\tests\Sabemi.Checks                          # validação
+dotnet run --project .\tests\Sabemi.Checks
 $env:SABEMI_TEST_CONNECTION = '<conexão de um banco de teste>'
-dotnet run --project .\tests\Sabemi.Checks -- --integration         # integração
+dotnet run --project .\tests\Sabemi.Checks -- --integration
 ```
 
 Cobrem payload válido/inválido, precisão monetária, fuso, chaves duplicadas, autenticação, 12 envios simultâneos, conflito, filtros, paginação, recuperação após reinício e OpenAPI.
-
-## Limites intencionais
-
-Um worker por processo e transação aberta durante a simulação de 2s; volume alto pede outbox/leases. O "exatamente uma vez" vale para o PostgreSQL, não para efeitos externos. Logs brutos exigem política de retenção; em produção, use HTTPS e autenticação própria em vez da API key compartilhada.
