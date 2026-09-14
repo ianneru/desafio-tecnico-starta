@@ -9,7 +9,7 @@ Recebe webhooks de pagamento autenticados, guarda o log bruto de cada tentativa,
 ```bash
 git clone https://github.com/ianneru/desafio-tecnico-starta.git
 cd desafio-tecnico-starta
-cp .env.example .env    # preencha as credenciais (próxima seção)
+# crie o .env na raiz com as credenciais (veja abaixo)
 docker compose up --build -d
 ```
 
@@ -18,7 +18,12 @@ docker compose up --build -d
 
 ## Credenciais e login
 
-O repositório **não** traz senha nem API key. Preencha o `.env` na raiz (está no `.gitignore`, nunca versione):
+O repositório **não** traz senha nem API key. Crie o `.env` na raiz (está no `.gitignore`, nunca versione):
+
+```ini
+POSTGRES_PASSWORD=defina-uma-senha
+SABEMI_API_KEY=defina-uma-chave-com-no-minimo-32-bytes
+```
 
 | Variável | Descrição |
 | --- | --- |
